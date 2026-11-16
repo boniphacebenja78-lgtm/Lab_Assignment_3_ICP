@@ -9,10 +9,7 @@
 
 using namespace std;
 
-// ==========================================
-// Part A: Structs and Custom Exceptions
-// ==========================================
-
+//structs for Date, Course, and Student
 struct Course {
     string code;
     string title;
@@ -26,19 +23,17 @@ struct Student {
     vector<Course> courses;
 };
 
-// Custom Exception for invalid score
 class InvalidScoreException : public invalid_argument {
 public:
     InvalidScoreException(const string& msg) : invalid_argument(msg) {}
 };
 
-// Custom Exception for unknown student ID
 class UnknownStudentException : public runtime_error {
 public:
     UnknownStudentException(const string& msg) : runtime_error(msg) {}
 };
 
-// Helper function for grade lookup (from previous questions)
+// helper functions for grade lookup
 string getLetterGrade(int score) {
     if (score >= 80) return "A";
     if (score >= 75) return "B+";
@@ -61,9 +56,7 @@ double getGradePoints(int score) {
     return 0.0;
 }
 
-// ==========================================
-// Main Function (Part B, C, D)
-// ==========================================
+// main part function
 int main() {
     ifstream infile("records.txt");
     ofstream errfile("errors.log");
@@ -77,7 +70,7 @@ int main() {
     string line;
     int lineNumber = 0;
 
-    // --- Part B: Read file line by line ---
+    // getline, reading the file line by line-
     while (getline(infile, line)) {
         lineNumber++;
         if (line.empty()) continue;
@@ -91,13 +84,13 @@ int main() {
                 string id, name;
                 iss >> id;
                 
-                // Read quoted name
+                // quotea name;
                 char quote;
-                iss >> quote; // read opening quote
+                iss >> quote; 
                 if (quote != '"') {
                     throw runtime_error("Malformed name: missing opening quote");
                 }
-                getline(iss, name, '"'); // read until closing quote
+                getline(iss, name, '"');
                 
                 students[id] = {id, name, {}};
             } 
@@ -108,7 +101,7 @@ int main() {
                 
                 iss >> id >> code;
                 
-                // Read quoted title
+               
                 char quote;
                 iss >> quote;
                 if (quote != '"') {
@@ -118,12 +111,12 @@ int main() {
                 
                 iss >> credits >> score;
 
-                // Check if student exists
+                // Checks if student exists and  score is vlaid.
                 if (students.find(id) == students.end()) {
                     throw UnknownStudentException("Unknown student ID: " + id);
                 }
 
-                // Check if score is valid
+                
                 if (score < 0 || score > 100) {
                     throw InvalidScoreException("Score " + to_string(score) + " out of range 0-100 for course " + code);
                 }
@@ -131,12 +124,11 @@ int main() {
                 students[id].courses.push_back({code, title, credits, score});
             } 
             else {
-                // Part C: runtime_error for lines not starting with STUDENT or COURSE
                 throw runtime_error("Line does not start with STUDENT or COURSE");
             }
 
         } 
-        // --- Part C: Catch exceptions by const reference, most specific first ---
+        // catch expections and log erors.
         catch (const InvalidScoreException& e) {
             errfile << "Line " << lineNumber << ": InvalidScoreException - " << e.what() << endl;
         } 
@@ -151,7 +143,7 @@ int main() {
     infile.close();
     errfile.close();
 
-    // --- Part D: Write transcript_<ID>.txt for each student ---
+    // transcript for each student and write to file
     for (auto const& [id, student] : students) {
         string filename = "transcript_" + id + ".txt";
         ofstream outfile(filename);
